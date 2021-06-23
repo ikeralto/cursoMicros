@@ -23,14 +23,48 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	//Permisos que van a tener nuestros endpoints para generar el token y validarlo
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		super.configure(security);
+		// cualquiera puede acceder a esta ruta:  /token/auth
+		security.tokenKeyAccess("permitAll()")
+		//se encarga de validar el token esta ruta requiere autenticacion
+		.checkTokenAccess("isAuthenticated()")
+		;
 	}
 
+	//Aquí se registran los clientes:
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		super.configure(clients);
+		//usamos inMemory, pero podríamos utilizar JDB oe l que quisieramos
+		clients.inMemory()
+		//clientId=frontendapp		
+		.withClient("frontendapp")
+		//secret:12345
+		.secret(passwordEncoder.encode("12345"))
+		//scopes
+		.scopes("read","write")
+		//grantypes password, autorization_code, implicit
+		.authorizedGrantTypes("password", "refresh_token")
+		//1 hora
+		.accessTokenValiditySeconds(3600)
+		//1 hora
+		.refreshTokenValiditySeconds(3600)
+		/** 2º cliente
+		.and()
+		.withClient("androidapp")
+		//secret:54321
+		.secret(passwordEncoder.encode("54321"))
+		//scopes
+		.scopes("read","write")
+		//grantypes password, autorization_code, implicit
+		.authorizedGrantTypes("password", "refresh_token")
+		//1 hora
+		.accessTokenValiditySeconds(3600)
+		//1 hora
+		.refreshTokenValiditySeconds(3600)
+		**/
+		;
 	}
 
 	@Override
