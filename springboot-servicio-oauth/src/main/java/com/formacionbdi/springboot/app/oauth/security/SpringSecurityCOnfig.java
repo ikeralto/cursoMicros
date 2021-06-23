@@ -1,7 +1,9 @@
 package com.formacionbdi.springboot.app.oauth.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +15,7 @@ public class SpringSecurityCOnfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private UserDetailsService usuarioService;
 
+	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
@@ -23,6 +26,13 @@ public class SpringSecurityCOnfig extends WebSecurityConfigurerAdapter{
 		super.configure(auth);
 		auth.userDetailsService(this.usuarioService).passwordEncoder(passwordEncoder());
 	}
+
+	@Override
+	@Bean
+	protected AuthenticationManager authenticationManager() throws Exception {	
+		return super.authenticationManager();
+	}
+	
 	
 	
 
