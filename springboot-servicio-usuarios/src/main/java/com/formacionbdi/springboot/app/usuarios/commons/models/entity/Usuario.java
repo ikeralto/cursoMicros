@@ -42,6 +42,16 @@ public class Usuario implements Serializable {
 	uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id","role_id"})}
 	)
 	private List<Role> roles;
+	
+	private Integer intentos;
+
+	public Integer getIntentos() {
+		return intentos;
+	}
+
+	public void setIntentos(Integer intentos) {
+		this.intentos = intentos;
+	}
 
 	public Long getId() {
 		return id;

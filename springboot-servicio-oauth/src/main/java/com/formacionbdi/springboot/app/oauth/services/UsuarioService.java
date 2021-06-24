@@ -48,4 +48,9 @@ public class UsuarioService implements UserDetailsService,IUsuarioService {
 
 	}
 
+	@Override
+	public Usuario update(Usuario usuario, Long id) {		
+		return client.update(usuario, id);
+	}
+
 }
