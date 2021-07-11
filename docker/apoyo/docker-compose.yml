@@ -25,6 +25,7 @@ services:
   db-postgres-curso_micros:
     image: postgres:11
     container_name: db-postgres-curso_micros
+    restart: always
     environment:
       POSTGRES_PASSWORD: 'password'
       POSTGRES_USER: 'user'
@@ -37,8 +38,9 @@ services:
       - postgreVolumeCursoMicros:/var/lib/postgresql/data
 
   rabbitmq-curso:
-    image: rabbitmq:3-management
+    image: rabbitmq:3.8-management-alpine
     container_name: rabbitmq-curso
+    restart: always
     mem_limit: 350m
     expose:
       - '5672'
@@ -53,35 +55,56 @@ services:
       retries: 10      
 
   zipkin-curso:
-    image: openzipkin/zipkin
-    container_name: zipkin-curso
-    mem_limit: 512m
-    environment:
-      RABBIT_ADDRESSES: 'rabbitmq-curso'
-      STORAGE_TYPE: mem
- #     STORAGE_TYPE: 'mysql'
- #     MYSQL_HOST: 'db-mysql-curso' 
- #     MYSQL_USER: 'zipkin'
- #     MYSQL_PASS: 'zipkin'
- #     MYSQL_DB: 'zipkin'
-    expose:
-      - '9411' 
-    ports:
-      - '9411:9411'
-    depends_on:
-      rabbitmq-curso:
-        condition: service_healthy
-      
+     image: openzipkin/zipkin
+     container_name: zipkin-curso
+     restart: always
+     mem_limit: 512m
+     environment:
+       RABBIT_ADDRESSES: 'rabbitmq-curso'
+       STORAGE_TYPE: mem
+      # STORAGE_TYPE: 'mysql'
+      # MYSQL_HOST: 'db-mysql-curso' 
+      # MYSQL_USER: 'zipkin'
+      # MYSQL_PASS: 'zipkin'
+      # MYSQL_DB: 'zipkin'
+     expose:
+       - '9411' 
+     ports:
+       - '9411:9411'
+     depends_on:
+       rabbitmq-curso:
+         condition: service_healthy
+         
+
   config-server:
     image: curso-config-server:v1
     container_name: curso-config-server
+    restart: always
     expose:
       - '9999'   
     ports:
-      - '9999:9999'     
+      - '9999:9999'
+    depends_on:
+      rabbitmq-curso:
+        condition: service_healthy
 
+  eureka-server:
+    image: curso-eureka-server:v1
+    container_name: curso-eureka-server
+    restart: always
+    expose:
+      - '8761'   
+    ports:
+      - '8761:8761' 
+    depends_on:
+      rabbitmq-curso:
+        condition: service_healthy     
       
 # Names our volume
 volumes:
   my-db:
   postgreVolumeCursoMicros: 
+ 
+networks:
+  default:
+    name: curso-microservicios-network

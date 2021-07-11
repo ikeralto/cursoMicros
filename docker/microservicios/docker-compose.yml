@@ -1,0 +1,43 @@
+version: '3.3'
+services:
+
+
+     
+  servicio-productos:
+    image: curso-servicio-productos:v1
+    container_name: curso-servicio-productos
+
+  servicio-usuarios:
+    image: curso-servicio-usuarios:v1
+    container_name: curso-servicio-usuarios
+  servicio-oauth:
+    image: curso-servicio-oauth:v1
+    container_name: curso-servicio-oauth    
+    expose:
+      - '9100'   
+    ports:
+      - '9100:9100'   
+  servicio-item:
+    image: curso-servicio-item:v1
+    container_name: curso-servicio-item    
+    expose:
+      - '8005'   
+    ports:
+      - '8005:8005'          
+      
+  zuul-server:
+    image: curso-zuul-server:v1
+    container_name: curso-zuul-server
+    expose:
+      - '8090'   
+    ports:
+      - '8090:8090'   
+    depends_on:    
+      - servicio-productos
+      - servicio-usuarios
+      - servicio-oauth
+ 
+networks:
+  default:
+    external:
+        name: curso-microservicios-network
