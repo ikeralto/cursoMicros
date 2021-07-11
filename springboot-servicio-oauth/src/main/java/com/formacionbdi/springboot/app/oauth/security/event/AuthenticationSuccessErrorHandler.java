@@ -32,15 +32,17 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 	@Override
 	public void publishAuthenticationSuccess(Authentication authentication) {
 		UserDetails user= (UserDetails)authentication.getPrincipal();
-		log.info("Success login:"+user.getUsername());
-		try {
-			Usuario usuario=usuarioService.findyByUsername(user.getUsername());											
-			if(usuario.getIntentos()!=null && usuario.getIntentos()>0) {
-				usuario.setIntentos(0);
-				usuarioService.update(usuario, usuario.getId());	
-			}			
-		}catch(FeignException fe) {
-			log.error(String.format("El usuario %s no existe en el sistema  error:",authentication.getName(),fe));
+		if(!authentication.getAuthorities().isEmpty()) {
+			log.info("Success login:"+user.getUsername());
+			try {
+				Usuario usuario=usuarioService.findyByUsername(user.getUsername());											
+				if(usuario.getIntentos()!=null && usuario.getIntentos()>0) {
+					usuario.setIntentos(0);
+					usuarioService.update(usuario, usuario.getId());	
+				}			
+			}catch(FeignException fe) {
+				log.error(String.format("El usuario %s no existe en el sistema  error:",authentication.getName(),fe));
+			}
 		}
 		
 		
